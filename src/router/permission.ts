@@ -17,28 +17,34 @@ router.beforeEach(async (to, _, next) => {
 	NProgress.start()
 
 	document.title = (to?.meta?.title || 'Mobile Project') as string
+
+	const permissionStore = usePermissionStore()
+	const hasRoutes = permissionStore.routes && permissionStore.routes.length > 0
+
 	// 全局是否允许进行权限验证
 	if (import.meta.env.VITE_OPEN_PERMISSION === 'false') {
-		// 全部追加
-		addRoute(asyncRoutes)
-		next()
+		if (hasRoutes) {
+			next()
+		} else {
+			// 全部追加
+			addRoute(asyncRoutes)
+			next({ ...to, replace: true })
+		}
 		return
 	}
 	const hasToken = getToken()
-	const permissionStore = usePermissionStore()
 	const userStore = useUserStore()
 
 	if (hasToken) {
 		if (to.path === '/login') {
 			next({ path: '/' })
 		} else {
-			const hasRoutes =
-				permissionStore.routes && permissionStore.routes.length > 0
 			if (hasRoutes) {
 				next()
 			} else {
 				try {
 					const authRoutes = await userStore.getPermission()
+
 					addRoute(authRoutes)
 					next({ ...to, replace: true })
 				} catch (error) {
@@ -72,9 +78,12 @@ router.afterEach(() => {
 const addRoute = async (authRoutes) => {
 	const permissionStore = usePermissionStore()
 	const routes = await permissionStore.generateRoutes(authRoutes)
+
 	const completeRoutes = deepClone(staticRoutes)
+
 	const defaultPathIdx = completeRoutes.findIndex((route) => route.path === '/')
 	completeRoutes[defaultPathIdx].children.push(...routes)
+
 	completeRoutes.forEach((route) => {
 		router.addRoute(route)
 	})

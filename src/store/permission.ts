@@ -18,9 +18,8 @@ export const usePermissionStore = defineStore('permission', {
 			return new Promise((resolve) => {
 				const accessedRoutes = filterAsyncRoutes(deepClone(asyncRoutes), routes)
 				const notEmptyRoutes = filterEmptyRoutes(accessedRoutes)
-				const concatRoutes = [...accessedRoutes, ...staticRoutes]
 				this.routes = notEmptyRoutes
-				resolve(concatRoutes)
+				resolve(notEmptyRoutes)
 			})
 		}
 	}
