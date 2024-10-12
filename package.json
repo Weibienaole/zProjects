@@ -1,0 +1,24 @@
+{
+  "uni-app": {
+    "scripts": {
+      "devWX": {
+        "title": "dev wx",
+        "env": {
+          "UNI_PLATFORM": "mp-weixin"
+        },
+        "define": {
+          "DEV": true
+        }
+      },
+      "prodWX": {
+        "title": "prod wx",
+        "env": {
+          "UNI_PLATFORM": "mp-weixin"
+        },
+        "define": {
+          "PROD": true
+        }
+      }
+    }
+  }
+}
